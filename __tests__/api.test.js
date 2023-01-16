@@ -24,4 +24,33 @@ describe('GET requests', () => {
             expect(snacks[0]).toHaveProperty('description')
         })
     })
+
+    test('200 : responds with correct articles object', () => {
+        return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then((result) => {
+            const {body} = result
+            const articles = body.articles
+            console.log(articles)
+            expect(body).toHaveProperty('articles')
+            expect(articles).toHaveLength(12)
+            
+            articles.forEach((article) => {
+                expect(article).toHaveProperty('article_id');
+                expect(article).toHaveProperty('title');
+                expect(article).toHaveProperty('topic');
+                expect(article).toHaveProperty('author');
+                expect(article).toHaveProperty('body');
+                expect(article).toHaveProperty('created_at');
+                expect(article).toHaveProperty('votes');
+                expect(article).toHaveProperty('article_img_url');
+                expect(article).toHaveProperty('comment_count');
+            })
+          
+          
+        })
+    })
+  
+
 })
