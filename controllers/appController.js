@@ -1,3 +1,4 @@
+
 const {fetchTopics, fetchSpecificArticle} = require('../models/appModels.js')
 
 const getTopics = (request,response,next) => {
@@ -9,14 +10,22 @@ const getTopics = (request,response,next) => {
     })
 }
 
+
 const getSpecificArticle = (request, response, next) => {
      const {article_id} = request.params
     fetchSpecificArticle(article_id).then((article) => {
         response.status(200).send({article})
+
+
+const getArticles = (request,response,next) => {
+    fetchArticles().then((articles) => {
+        response.status(200).send({articles})
     })
     .catch((error) => {
         next (error)
     })
 }
 
-module.exports = {getTopics, getSpecificArticle}
+
+module.exports = {getTopics, getArticles, getSpecificArticle}
+
