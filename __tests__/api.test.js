@@ -24,6 +24,7 @@ describe('GET requests', () => {
             expect(snacks[0]).toHaveProperty('description')
         })
     })
+
     test('200 : responds with correct articles object', () => {
         return request(app)
         .get('/api/articles')
@@ -51,4 +52,5 @@ describe('GET requests', () => {
         })
     })
   
+
 })

@@ -1,4 +1,7 @@
+
 const {fetchTopics, fetchArticles} = require('../models/appModels.js')
+=======
+
 
 const getTopics = (request,response,next) => {
     fetchTopics().then((topics) => {
@@ -8,6 +11,7 @@ const getTopics = (request,response,next) => {
         next (error)
     })
 }
+
 
 const getArticles = (request,response,next) => {
     fetchArticles().then((articles) => {
@@ -19,3 +23,4 @@ const getArticles = (request,response,next) => {
 }
 
 module.exports = {getTopics, getArticles}
+

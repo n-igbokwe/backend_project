@@ -6,6 +6,7 @@ const fetchTopics = () => {
     })
 }
 
+
 const fetchArticles = () => {
     return db.query('SELECT article_id FROM comments;').then(({rows}) => {
         const articleIds = rows
@@ -30,3 +31,4 @@ const fetchArticles = () => {
 }
 
 module.exports = {fetchTopics, fetchArticles}
+
