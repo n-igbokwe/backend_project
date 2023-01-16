@@ -7,6 +7,27 @@ const fetchTopics = () => {
 }
 
 
+const fetchSpecificArticle = (id) => {
+    const queryString = 'SELECT * FROM articles WHERE article_id = $1'
+    const queryValues = [];
+
+    if (id !== undefined){
+        queryValues.push(id)
+    }
+
+    return db.query(queryString,queryValues).then(({rows}) => {
+        if (rows.length >= 1){
+            return rows
+        } else {
+            return Promise.reject({status:400, msg: 'Not Found'})
+            
+        }
+    })
+}
+
+
+
+
 const fetchArticles = () => {
     return db.query('SELECT article_id FROM comments;').then(({rows}) => {
         const articleIds = rows
@@ -30,5 +51,6 @@ const fetchArticles = () => {
     
 }
 
-module.exports = {fetchTopics, fetchArticles}
+module.exports = {fetchTopics, fetchArticles, fetchSpecificArticle}
+
 

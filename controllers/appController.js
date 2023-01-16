@@ -1,7 +1,5 @@
 
-const {fetchTopics, fetchArticles} = require('../models/appModels.js')
-=======
-
+const {fetchTopics, fetchSpecificArticle} = require('../models/appModels.js')
 
 const getTopics = (request,response,next) => {
     fetchTopics().then((topics) => {
@@ -13,6 +11,12 @@ const getTopics = (request,response,next) => {
 }
 
 
+const getSpecificArticle = (request, response, next) => {
+     const {article_id} = request.params
+    fetchSpecificArticle(article_id).then((article) => {
+        response.status(200).send({article})
+
+
 const getArticles = (request,response,next) => {
     fetchArticles().then((articles) => {
         response.status(200).send({articles})
@@ -22,5 +26,6 @@ const getArticles = (request,response,next) => {
     })
 }
 
-module.exports = {getTopics, getArticles}
+
+module.exports = {getTopics, getArticles, getSpecificArticle}
 
