@@ -1,5 +1,6 @@
 const express = require('express');
-const {getTopics} = require('../controllers/appController.js')
+const { noData } = require('pg-protocol/dist/messages.js');
+const {getTopics, getSpecificArticle} = require('../controllers/appController.js')
 
 const app = express();
 
@@ -7,19 +8,20 @@ app.use(express.json())
 
 app.get('/api/topics', getTopics)
 
+app.get('/api/articles/:article_id', getSpecificArticle)
+
 app.use((error,request,response,next) => {
-    console.log("first")
+    console.log (error.msg)
     if (error.status){
-        console.log(error)
-        response.status(error.status).send({msg:err.msg})
+        response.status(error.status).send({msg:error.msg})
     } else {
-        next(err)
+        console.log("no")
     }
 })
 
-app.use((error,request,response,next) => {
-    console.log("second")
-    console.log(error, "<----- this is the error")
-})
+// app.use((error,request,response,next) => {
+
+//     response.status(500).send(error)
+// })
 
 module.exports = {app}

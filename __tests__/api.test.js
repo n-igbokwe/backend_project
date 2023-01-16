@@ -24,4 +24,29 @@ describe('GET requests', () => {
             expect(snacks[0]).toHaveProperty('description')
         })
     })
+    test('200: responds with correct specific article object', () => {
+        return request(app)
+        .get('/api/articles/2')
+        .expect(200)
+        .then(({body: {article}}) => {
+            let articleZero = article[0]
+            expect(articleZero).toHaveProperty('author');
+            expect(articleZero).toHaveProperty('title');
+            expect(articleZero).toHaveProperty('article_id');
+            expect(articleZero).toHaveProperty('body');
+            expect(articleZero).toHaveProperty('topic');
+            expect(articleZero).toHaveProperty('created_at');
+            expect(articleZero).toHaveProperty('votes');
+            expect(articleZero).toHaveProperty('article_img_url');
+            expect(articleZero.article_id).toBe(2)
+        })
+    })
+    test.only('400 : handles a bad request with out of bounds :article_id', () => {
+        return request(app)
+        .get('/api/articles/999')
+        .expect(400)
+        .then(({body : {msg}}) => { 
+            expect(msg).toBe("Not Found")
+        })
+    })
 })
