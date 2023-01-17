@@ -1,3 +1,4 @@
+const { query } = require('../db/connection.js')
 const db = require('../db/connection.js')
 
 const fetchTopics = () => {
@@ -7,31 +8,10 @@ const fetchTopics = () => {
 }
 
 
-const fetchSpecificArticle = (id) => {
-    const queryString = 'SELECT * FROM articles WHERE article_id = $1'
-    const queryValues = [];
-
-    if (id !== undefined){
-        queryValues.push(id)
-    }
-
-    return db.query(queryString,queryValues).then(({rows}) => {
-        if (rows.length >= 1){
-            return rows
-        } else {
-            return Promise.reject({status:400, msg: 'Not Found'})
-            
-        }
-    })
-}
-
-
-
-
 const fetchArticles = () => {
     return db.query('SELECT article_id FROM comments;').then(({rows}) => {
         const articleIds = rows
-        return db.query('SELECT * FROM articles;').then(({rows}) => {
+        return db.query('SELECT * FROM articles ORDER BY created_at DESC;').then(({rows}) => {
             const allArticles = rows
             const allArticlesWithCommentCount = allArticles.map((article) => {
                 let count = 0
@@ -49,6 +29,51 @@ const fetchArticles = () => {
             
         })
     
+}
+
+const fetchSpecificArticle = (id) => {
+    const queryString = 'SELECT * FROM articles WHERE article_id = $1;'
+    const queryValues = [];
+
+    //The below code works but a simpler way is to simply let the ID go through if it is not numbers - this will trigger and SQL error which can simply be handled in our error handlers
+    // if (typeof +id !== 'number' || isNaN(+id)){
+    //     return Promise.reject({status : 400, msg: 'Bad Request'})
+    // }
+    if (id !== undefined){
+        queryValues.push(id)
+    }
+
+    return db.query(queryString,queryValues).then(({rows}) => {
+        if (rows.length >= 1){
+            return rows
+        } else {
+            return Promise.reject({status:404, msg: 'Not Found'})
+            
+        }
+    })
+}
+
+const fetchSpecificComments = (id) => {
+    const queryString = `SELECT * FROM comments WHERE article_id = $1 ORDER BY creted_at DESC;`
+    return db.query(queryString, [id]).then(({rows}) => {
+        return rows
+    })
+
+}
+
+const fetchSpecificCommentsByArticleId = (id) => {
+    const queryString = 'SELECT article_id FROM articles WHERE article_id = $1;'
+    return db.query(queryString, [id]).then(({rowCount}) => {
+        console.log(rowCount)
+        if (rowCount === 0){
+            return Promise.reject({status: 404, msg: 'Not Found'})
+            
+        } else {
+            
+            return;
+            
+        }
+    })
 }
 
 const publishCommentWithArticleId = (article_id, body) => {
@@ -77,6 +102,8 @@ const publishCommentWithArticleId = (article_id, body) => {
     })
 }
 
-module.exports = {fetchTopics, fetchArticles, fetchSpecificArticle, publishCommentWithArticleId}
+
+
+module.exports = {fetchTopics, fetchArticles, fetchSpecificArticle, fetchSpecificComments, fetchSpecificCommentsByArticleId, publishCommentWithArticleId}
 
 
