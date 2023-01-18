@@ -105,12 +105,101 @@ describe('GET requests', () => {
             expect(msg).toBe('Not Found')
         })
     })
-    test.only('400: handles bad request with an article_id that is NaN', () => {
+    test('400: handles bad request with an article_id that is NaN', () => {
         return request(app)
         .get('/api/articles/cheese/comments')
         .expect(500)
         .then(({body}) => {
             expect(body.name).toBe('error')
+        })
+    })
+})
+
+describe.only('complex queries', () => {
+    test('10 200: accepts topic filter', () => {
+        return request(app)
+        .get('/api/articles?topic=cats')
+        .expect(200)
+        .then(({body : {articles}}) => {
+            expect(articles).toHaveLength(1)
+            const [firstArticle] = articles
+            expect(firstArticle).toHaveProperty('topic', 'cats')
+            expect(firstArticle).toHaveProperty('article_id')
+            expect(firstArticle).toHaveProperty('title')
+            expect(firstArticle).toHaveProperty('comment_count')
+        })
+    })
+    test('10 200: accepts sort_by queries', () => {
+        return request (app)
+        .get('/api/articles?sort_by=votes')
+        .expect(200)
+        .then(({body : {articles}}) => {
+            expect(articles).toHaveLength(12)
+            const [firstArticle, secondArticle] = articles
+            expect(firstArticle).toHaveProperty('votes',100)
+            expect(secondArticle).toHaveProperty('votes', 0)
+        })
+    })
+    test('10 200: topic and sort_by queries work together', () => {
+        return request(app)
+        .get('/api/articles?topic=mitch&sort_by=votes')
+        .expect(200)
+        .then(({body : {articles}}) => {
+            expect(articles).toHaveLength(11)
+            const [firstArticle, secondArticle] = articles
+            expect(firstArticle && secondArticle).toHaveProperty('topic', 'mitch')
+            expect(firstArticle).toHaveProperty('votes', 100)
+            expect(secondArticle).toHaveProperty('votes', 0)
+        })
+    })
+    test('10 200: accepts order query', () => {
+        return request(app)
+        .get('/api/articles?order=asc')
+        .expect(200)
+        .then(({body : {articles}}) => {
+            expect(articles).toHaveLength(12)
+            const[firstArticle] = articles
+            expect(firstArticle).toHaveProperty('created_at', '2020-01-07T14:08:00.000Z')   
+            const {11 : lastArticle} = articles
+            expect(lastArticle).toHaveProperty('created_at', '2020-11-03T09:12:00.000Z' )
+      
+        })
+    })
+    test('10 200: accepts all queries together', () => {
+        return request (app)
+        .get('/api/articles?topic=mitch&sort_by=article_id&order=desc')
+        .expect(200)
+        .then(({body : {articles}}) => {
+            expect(articles).toHaveLength(11)
+            const [firstArticle] = articles
+            expect(firstArticle).toHaveProperty('article_id', 12)
+            const {10 : lastArticle} = articles
+            expect(lastArticle).toHaveProperty('article_id', 1)
+
+        })
+    })
+    test('10 400: handles errors correctly when passed non greenlisted argument', () => {
+        return request (app)
+        .get('/api/articles?order=hacker')
+        .expect(400)
+        .then(({body})=> {
+            expect(body).toEqual({"msg": "Bad Request"})
+        })
+    })
+    test('10 400: handles errors correctly when passed non greenlisted argument', () => {
+        return request (app)
+        .get('/api/articles?sort_by=hacker')
+        .expect(400)
+        .then(({body})=> {
+            expect(body).toEqual({"msg": "Bad Request"})
+        })
+    })
+    test('10 400 handles errors correctly when passed a corect argument and a non greenlisted argument', () => {
+        return request (app)
+        .get('/api/articles?sort_by=hacker&order=desc')
+        .expect(400)
+        .then(({body})=> {
+            expect(body).toEqual({"msg": "Bad Request"})
         })
     })
 })
