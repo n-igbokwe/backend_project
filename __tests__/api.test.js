@@ -105,12 +105,66 @@ describe('GET requests', () => {
             expect(msg).toBe('Not Found')
         })
     })
-    test.only('400: handles bad request with an article_id that is NaN', () => {
+    test('400: handles bad request with an article_id that is NaN', () => {
         return request(app)
         .get('/api/articles/cheese/comments')
         .expect(500)
         .then(({body}) => {
             expect(body.name).toBe('error')
+        })
+    })
+})
+
+describe('PATCH REQUESTS', () => {
+    test('8 200: responds with updated article and vincremeneted vote count', () => {
+        return request(app)
+        .patch('/api/articles/3')
+        .send({inc_votes : 100})
+        .expect(200)
+        .then(({body : {article}}) => {
+            const [articleObj] = article
+           expect(articleObj).toHaveProperty('article_id', 3);
+           expect(articleObj).toHaveProperty('votes', 100);
+           expect(articleObj).toHaveProperty('body', 'some gifs');
+        })
+    })
+    test('8 200: responds with updated article and decremented vote count', () => {
+        return request(app)
+        .patch('/api/articles/2')
+        .send({inc_votes : -100})
+        .expect(200)
+        .then(({body : {article}}) => {
+            const [articleObj] = article
+            expect(articleObj).toHaveProperty('article_id', 2);
+            expect(articleObj).toHaveProperty('votes', -100);
+            expect(articleObj).toHaveProperty('author', 'icellusedkars');
+        })
+    })
+    test('8 404: responds with an error when passed an invalid article_id', () => {
+        return request (app)
+        .patch('/api/articles/100')
+        .send({inc_votes : 100})
+        .expect(404)
+        .then(({body}) => {
+            expect(body).toHaveProperty('msg', 'Not Found')
+        })
+    })
+    test('8 400: responds with an error when passed an invalid amount to increement -decremenet votes', () => {
+        return request (app)
+        .patch('/api/articles/2')
+        .send({inc_votes : 'hello there!'})
+        .expect(400)
+        .then(({error : {text}}) => {
+            expect(text).toEqual("{\"msg\":\"BAD REQUEST\"}")
+        })
+    })
+    test.only('8 400: responds with an error when passed no patch object at all', () => {
+        return request (app)
+        .patch('/api/articles/2')
+        .send()
+        .expect(400)
+        .then(({error : {text}}) => {
+            expect(text).toEqual("{\"msg\":\"BAD REQUEST\"}")
         })
     })
 })

@@ -1,7 +1,7 @@
 const express = require('express');
 
 
-const {getTopics, getArticles, getSpecificArticle, getSpecificComments} = require('../controllers/appController.js')
+const {getTopics, getArticles, getSpecificArticle, getSpecificComments, patchVotes} = require('../controllers/appController.js')
 
 
 const app = express();
@@ -12,6 +12,7 @@ app.get('/api/topics', getTopics)
 app.get('/api/articles', getArticles)
 app.get('/api/articles/:article_id', getSpecificArticle)
 app.get('/api/articles/:article_id/comments', getSpecificComments)
+app.patch('/api/articles/:article_id', patchVotes)
 
 
 app.use((error,request,response,next) => {
@@ -25,7 +26,7 @@ app.use((error,request,response,next) => {
 
 app.use((error,request,response,next) => {
 
-    response.status(500).send(error)
+    response.status(400).send({msg: "BAD REQUEST"})
 })
 
 module.exports = {app}
