@@ -1,5 +1,5 @@
 
-const {fetchTopics, fetchArticles, fetchSpecificArticle, fetchSpecificComments, fetchSpecificCommentsByArticleId} = require('../models/appModels.js')
+const {fetchTopics, fetchArticles, fetchSpecificArticle, fetchSpecificComments, fetchSpecificCommentsByArticleId, fetchUsers} = require('../models/appModels.js')
 
 
 const getTopics = (request,response,next) => {
@@ -45,5 +45,12 @@ const getSpecificComments = (request, response, next) => {
     })
 }
 
-module.exports = {getTopics, getArticles, getSpecificArticle, getSpecificComments}
+const getUsers = (request, response, next) => {
+    fetchUsers().then((users) => {
+        response.status(200).send({users})
+    })
+}
+
+
+module.exports = {getTopics, getArticles, getSpecificArticle, getSpecificComments, getUsers}
 

@@ -105,7 +105,7 @@ describe('GET requests', () => {
             expect(msg).toBe('Not Found')
         })
     })
-    test.only('400: handles bad request with an article_id that is NaN', () => {
+    test('400: handles bad request with an article_id that is NaN', () => {
         return request(app)
         .get('/api/articles/cheese/comments')
         .expect(500)
@@ -113,4 +113,19 @@ describe('GET requests', () => {
             expect(body.name).toBe('error')
         })
     })
+    test('9 200: returns the correct users object', () => {
+        return request (app)
+        .get('/api/users')
+        .expect(200)
+        .then(({body : {users}}) => {
+            const [firstUser, secondUser] = users
+            expect(users).toHaveLength(4)
+            expect(firstUser).toHaveProperty('username')
+            expect(firstUser).toHaveProperty('name')
+            expect(firstUser).toHaveProperty('avatar_url')
+            expect(Object.keys(firstUser).length).toBe(3)
+            expect(Object.keys(secondUser).length).toBe(3)
+        })
+    })
+
 })

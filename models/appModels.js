@@ -76,6 +76,12 @@ const fetchSpecificCommentsByArticleId = (id) => {
     })
 }
 
-module.exports = {fetchTopics, fetchArticles, fetchSpecificArticle, fetchSpecificComments, fetchSpecificCommentsByArticleId}
+const fetchUsers = () => {
+    return db.query('SELECT * FROM users;').then(({rows}) => {
+        return rows
+    })
+}
+
+module.exports = {fetchTopics, fetchArticles, fetchSpecificArticle, fetchSpecificComments, fetchSpecificCommentsByArticleId, fetchUsers}
 
 
