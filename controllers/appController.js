@@ -1,5 +1,6 @@
 
-const {fetchTopics, fetchArticles, fetchSpecificArticle, fetchSpecificComments, fetchSpecificCommentsByArticleId, publishCommentWithArticleId, updateVotes} = require('../models/appModels.js')
+const {fetchTopics, fetchArticles, fetchSpecificArticle, fetchSpecificComments, fetchSpecificCommentsByArticleId, publishCommentWithArticleId, updateVotes, fetchUsers} = require('../models/appModels.js')
+
 
 
 
@@ -71,7 +72,17 @@ const patchVotes = (request, response, next) => {
 }
 
 
+const getUsers = (request, response, next) => {
+    fetchUsers().then((users) => {
+        response.status(200).send({users})
+    })
+}
 
-module.exports = {getTopics, getArticles, getSpecificArticle, getSpecificComments, postComment, patchVotes}
+
+
+
+
+module.exports = {getTopics, getArticles, getSpecificArticle, getSpecificComments, postComment, patchVotes, getUsers}
+
 
 
