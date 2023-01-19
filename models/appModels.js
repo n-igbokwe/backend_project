@@ -185,6 +185,44 @@ const fetchUsers = () => {
     })
 }
 
+const checkCommentIdBeforeRemove = (id) => {
+
+    
+        const queryString = 'SELECT comment_id FROM comments WHERE comment_id = $1;'
+        return db.query(queryString, [id]).then(({rowCount}) => {
+            if (rowCount === 0){
+                console.log('hereHEHEHEHEHEHE')
+                return Promise.reject({status: 404, msg: 'Not Found'})
+                
+            } else {
+                console.log('here')
+                return;
+                
+            }
+        })
+    }
+
+
+
+const removeComment = (article_id) => {
+
+    const deleteQueryString = `DELETE FROM comments WHERE comment_id = $1`
+    const errorQueryString = `SELECT * FROM comments WHERE comment_id = $1`
+
+db.query(deleteQueryString, [article_id])
+
+console.log(article_id)
+       return db.query(errorQueryString, [article_id]).then(({result}) => {
+            if (result){
+
+                return result
+            } else {
+
+                let message = {msg : 'No content status'}
+                return message
+            }
+        })
+}
 
 
 
@@ -192,7 +230,7 @@ const fetchUsers = () => {
 
 
 
-module.exports = {fetchTopics, fetchArticles, fetchSpecificArticle, fetchSpecificComments, fetchSpecificCommentsByArticleId, publishCommentWithArticleId, updateVotes, fetchUsers}
+module.exports = {fetchTopics, fetchArticles, fetchSpecificArticle, fetchSpecificComments, fetchSpecificCommentsByArticleId, publishCommentWithArticleId, updateVotes, fetchUsers,checkCommentIdBeforeRemove, removeComment}
 
 
 

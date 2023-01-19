@@ -2,7 +2,7 @@ const express = require('express');
 
 
 
-const {getTopics, getArticles, getSpecificArticle, postComment, getSpecificComments, patchVotes, getUsers} = require('../controllers/appController.js')
+const {getTopics, getArticles, getSpecificArticle, postComment, getSpecificComments, patchVotes, getUsers, deleteComment} = require('../controllers/appController.js')
 
 
 
@@ -17,10 +17,12 @@ app.post('/api/articles/:article_id/comments', postComment)
 app.get('/api/articles/:article_id/comments', getSpecificComments)
 app.get('/api/users', getUsers)
 app.patch('/api/articles/:article_id', patchVotes)
+app.delete('/api/comments/:comment_id', deleteComment)
 
 
 
 app.use((error,request,response,next) => {
+
     if (error.status){
         response.status(error.status).send({msg:error.msg})
     } else {

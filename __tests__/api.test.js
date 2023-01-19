@@ -351,3 +351,31 @@ describe.only('complex queries', () => {
         })
     })
 })
+
+describe('DELETE REQUESTS', () => {
+    test('12 204 deletes the given comment by comment_id and responds appropriately', () => {
+        return request (app)
+        .delete('/api/comments/2')
+        .expect(204)
+        .then((error) => {
+            expect(error.status).toBe(204);
+        })
+    })
+    test('12 404 responds with the appropriate error when given a comment_id that does not exist', () => {
+        return request (app)
+        .delete ('/api/comments/222')
+        .expect(404)
+        .then((error) => {
+            expect(error.status).toBe(404)
+        })
+    })
+    test('12 400 responds with the appropraite error when given a non-integer comment_id', () => {
+        return request(app)
+        .delete('/api/commments/hacker')
+        .expect(404)
+        .then((error) => {
+            expect(error.status).toBe(404)
+        })
+    })
+
+})
