@@ -80,25 +80,44 @@ if (!greenlistedSortBys.includes(sort_by) || !greenlistedOrders.includes(order))
 }
 
 const fetchSpecificArticle = (id) => {
-    const queryString = 'SELECT * FROM articles WHERE article_id = $1;'
-    const queryValues = [];
+    // const queryString = 'SELECT * FROM articles WHERE article_id = $1;'
+    // const queryString2 = ''
+    // const queryValues = [];
 
-    //The below code works but a simpler way is to simply let the ID go through if it is not numbers - this will trigger and SQL error which can simply be handled in our error handlers
-    // if (typeof +id !== 'number' || isNaN(+id)){
-    //     return Promise.reject({status : 400, msg: 'Bad Request'})
+    // //The below code works but a simpler way is to simply let the ID go through if it is not numbers - this will trigger and SQL error which can simply be handled in our error handlers
+    // // if (typeof +id !== 'number' || isNaN(+id)){
+    // //     return Promise.reject({status : 400, msg: 'Bad Request'})
+    // // }
+    // if (id !== undefined){
+    //     queryValues.push(id)
     // }
-    if (id !== undefined){
-        queryValues.push(id)
-    }
 
-    return db.query(queryString,queryValues).then(({rows}) => {
-        if (rows.length >= 1){
-            return rows
-        } else {
-            return Promise.reject({status:404, msg: 'Not Found'})
+    // return db.query(queryString,queryValues).then(({rows}) => {
+    //     if (rows.length >= 1){
+    //         return rows
+    //     } else {
+    //         return Promise.reject({status:404, msg: 'Not Found'})
             
-        }
-    })
+    //     }
+    // })
+
+            const queryString = `SELECT articles.*, COUNT(comment_id) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id WHERE articles.article_id = $1 GROUP BY articles.article_id`
+            return db.query(queryString, [id]).then(({rows}) => {
+                if (rows.length >= 1){
+                return rows
+                } else {
+                    return Promise.reject({status:404, msg : 'Not Found'})
+                }
+            })
+
+    
+
+        
+    
+    
+  
+
+
 }
 
 const fetchSpecificComments = (id) => {
