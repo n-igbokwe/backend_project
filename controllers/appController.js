@@ -39,7 +39,8 @@ const getSpecificComments = (request, response, next) => {
         .then((result) => {
             console.log(result)
         })
-
+    })
+}
 
 
 
