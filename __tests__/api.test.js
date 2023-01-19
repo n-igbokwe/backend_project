@@ -23,7 +23,7 @@ describe('GET requests', () => {
             expect(snacks[0]).toHaveProperty('slug');
             expect(snacks[0]).toHaveProperty('description')
         })
-    })
+
     test('200 : responds with correct articles object', () => {
         return request(app)
         .get('/api/articles')
@@ -48,6 +48,7 @@ describe('GET requests', () => {
         })
     })
          test('200: responds with correct specific article object', () => {
+
         return request(app)
         .get('/api/articles/2')
         .expect(200)
@@ -64,7 +65,9 @@ describe('GET requests', () => {
             expect(articleZero.article_id).toBe(2)
         })
     })
+
     test('404 : handles an invalid request with out of bounds :article_id', () => {
+
         return request(app)
         .get('/api/articles/999')
         .expect(404)
@@ -96,6 +99,65 @@ describe('GET requests', () => {
             expect(commentZero).toHaveProperty('created_at');
         })
     })
+
+
+    describe.only('POST REQUESTS', () => {
+        test('200: responds with posted article (ticket 7)', () =>{
+            return request (app)
+            .post('/api/articles/2/comments')
+            .expect(201)
+            .send({'username': 'butter_bridge', 'comment':'A very interesting opinion'})
+            .then(({body : {post}}) => {
+                expect(post).toHaveProperty('comment_id', 19)
+                expect(post).toHaveProperty('body', 'A very interesting opinion')
+                expect(post).toHaveProperty('article_id', 2)
+                expect(post).toHaveProperty('author', 'butter_bridge')
+            })
+
+        })
+        test('400: responds with an error when username does not exist', () => {
+            return request (app)
+            .post('/api/articles/2/comments')
+            .expect(400)
+            .send({
+                'username' : "notReal",
+                'comment' : ' Whocares',
+            })
+            .then(({body}) => {
+                expect(body).toHaveProperty('msg')
+            })
+        })
+        test('400: responds with an error when post object is too large', () => {
+            return request (app)
+            .post('/api/articles/2/comments')
+            .expect(400)
+            .send({
+                'username' : "notReal",
+                'comment' : ' Whocares',
+                'another' : 1
+            })
+            .then(({body}) => {
+                expect(body).toHaveProperty('msg', 'Bad Request')
+            })
+        })
+        test('400: responds with an error when article_id does not exist', () => {
+            return request (app)
+            .post('/api/articles/999/comments')
+            .expect(400)
+            .send({
+                'username' : "notReal",
+                'comment' : ' Whocares',
+            })
+            .then(({body}) => {
+                expect(body).toHaveProperty('msg')
+            })
+        })
+    })
+  
+
+
+})
+
     test('404 : handles an invalid request with out of bounds :article_id', () => {
         return request(app)
         .get('/api/articles/888/comments')

@@ -76,6 +76,33 @@ const fetchSpecificCommentsByArticleId = (id) => {
     })
 }
 
+const publishCommentWithArticleId = (article_id, body) => {
+    const newComment = [
+        body.comment,
+        article_id,
+        body.username,
+        
+    ]
+
+
+    const bodySize = Object.keys(body).length
+    if (bodySize > 2){
+        return Promise.reject({status: 400, msg: 'Bad Request'})
+    }
+
+
+
+    const queryString = `INSERT INTO comments (body, article_id, author) VALUES ($1, $2, $3) RETURNING *; `
+
+     return db.query(queryString, newComment).then(() => {
+        return db.query(`SELECT * FROM comments;`).then(({rows}) => {
+
+            return (rows[rows.length -1])
+        })
+    })
+}
+
+
 const updateVotes = (article_id, inc_votes) => {
 
     const queryString = `SELECT votes FROM articles WHERE article_id = $1;`
@@ -103,6 +130,11 @@ const updateVotes = (article_id, inc_votes) => {
 
 }
 
-module.exports = {fetchTopics, fetchArticles, fetchSpecificArticle, fetchSpecificComments, fetchSpecificCommentsByArticleId, updateVotes}
+
+
+
+
+module.exports = {fetchTopics, fetchArticles, fetchSpecificArticle, fetchSpecificComments, fetchSpecificCommentsByArticleId, publishCommentWithArticleId, updateVotes}
+
 
 
