@@ -8,26 +8,74 @@ const fetchTopics = () => {
 }
 
 
-const fetchArticles = () => {
-    return db.query('SELECT article_id FROM comments;').then(({rows}) => {
-        const articleIds = rows
-        return db.query('SELECT * FROM articles ORDER BY created_at DESC;').then(({rows}) => {
-            const allArticles = rows
-            const allArticlesWithCommentCount = allArticles.map((article) => {
-                let count = 0
+const fetchArticles = (order = 'desc', sort_by = 'created_at', topic) => {
+    const greenlistedSortBys = ['created_at', 'article_id', 'title', 'created_at', 'votes']
+    const greenlistedOrders = ['asc', 'desc']
 
-                articleIds.map(({article_id}) => {
-                    if (article_id === article.article_id){
-                        count++
-                    }
-                })
-                article.comment_count = count
-                return article
-                })
-                return allArticlesWithCommentCount
-            })
-            
-        })
+  
+let queryString = `SELECT * FROM articles `
+
+if (topic !== undefined){
+    queryString += 'WHERE topic = $1 '
+    if (!greenlistedSortBys.includes(sort_by) || !greenlistedOrders.includes(order)){
+        return Promise.reject({status:400, msg: 'Bad Request'})
+    } else {
+
+        queryString += `ORDER BY ${sort_by} ${order}`
+
+    
+        return db.query(queryString, [topic]).then(({rows}) => {
+    const topicArticles = rows
+
+   return db.query(`SELECT article_id FROM comments;`).then(({rows}) => {
+        const articleIds = rows
+        const topicArticlesWithCommentCount = topicArticles.map((article) => {
+                        let count = 0
+        
+                        articleIds.map(({article_id}) => {
+                            if (article_id === article.article_id){
+                                count++
+                            }
+                        })
+                        article.comment_count = count
+                        return article
+                        })
+                        return topicArticlesWithCommentCount
+                        })
+    })
+    }
+
+} else {
+if (!greenlistedSortBys.includes(sort_by) || !greenlistedOrders.includes(order)){
+        return Promise.reject({status:400, msg: 'Bad Request'})
+    } else {
+
+        return db.query('SELECT article_id FROM comments').then(({rows}) => {
+            const articleIds = rows
+           return  db.query(`SELECT * FROM articles ORDER BY ${sort_by} ${order}`).then(({rows}) => {
+                const allArticles = rows
+                const allArticlesWithCommentCount = allArticles.map((article) => {
+                    let count = 0
+    
+                    articleIds.map(({article_id}) => {
+                        if (article_id === article.article_id){
+                            count++
+                        }
+                    })
+                    article.comment_count = count
+                    return article
+                    })
+                    return allArticlesWithCommentCount
+                    })
+                   
+                })  
+
+    }
+     
+        
+
+}
+
     
 }
 
