@@ -103,7 +103,38 @@ const publishCommentWithArticleId = (article_id, body) => {
 }
 
 
+const updateVotes = (article_id, inc_votes) => {
 
-module.exports = {fetchTopics, fetchArticles, fetchSpecificArticle, fetchSpecificComments, fetchSpecificCommentsByArticleId, publishCommentWithArticleId}
+    const queryString = `SELECT votes FROM articles WHERE article_id = $1;`
+    let newVotes;
+
+    return db.query(queryString, [article_id]).then(({rows}) => {
+        if (rows.length === 0){
+            return Promise.reject ({status : 404, msg: 'Not Found'})
+        }
+        const [voteObj] = rows
+
+        if (Math.sign(inc_votes) === 1){
+             newVotes = voteObj.votes + inc_votes
+        } else if (Math.sign(inc_votes) === -1){
+            newVotes = voteObj.votes - Math.abs(inc_votes)
+        }
+        const valueArray = [newVotes, article_id];
+        return db.query(`UPDATE articles SET votes = $1 WHERE article_id = $2;`, valueArray).then(() => {
+
+            return db.query(`SELECT * FROM articles WHERE article_id = $1`, [article_id]).then(({rows}) => {
+                return rows
+            })
+        })
+    })
+
+}
+
+
+
+
+
+module.exports = {fetchTopics, fetchArticles, fetchSpecificArticle, fetchSpecificComments, fetchSpecificCommentsByArticleId, publishCommentWithArticleId, updateVotes}
+
 
 

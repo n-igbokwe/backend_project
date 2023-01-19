@@ -1,4 +1,6 @@
-const {fetchTopics, fetchArticles, fetchSpecificArticle, fetchSpecificComments, fetchSpecificCommentsByArticleId, publishCommentWithArticleId} = require('../models/appModels.js')
+
+const {fetchTopics, fetchArticles, fetchSpecificArticle, fetchSpecificComments, fetchSpecificCommentsByArticleId, publishCommentWithArticleId, updateVotes} = require('../models/appModels.js')
+
 
 
 const getTopics = (request,response,next) => {
@@ -55,6 +57,20 @@ const postComment = (request, response, next) => {
 }
 
 
-module.exports = {getTopics, getArticles, getSpecificArticle, getSpecificComments, postComment}
+const patchVotes = (request, response, next) => {
+    const {article_id} = request.params
+    const {inc_votes} = request.body
+    updateVotes(article_id, inc_votes)
+    .then((article) =>  {
+        response.status(200).send({article})
+    })
+    .catch((error) => {
+        next(error)
+    })
+}
+
+
+
+module.exports = {getTopics, getArticles, getSpecificArticle, getSpecificComments, postComment, patchVotes}
 
 
