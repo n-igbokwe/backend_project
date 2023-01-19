@@ -64,6 +64,7 @@ describe('GET requests', () => {
             expect(articleZero.article_id).toBe(2)
         })
     })
+
     test('404 : handles an invalid request with out of bounds :article_id', () => {
         return request(app)
         .get('/api/articles/999')
@@ -128,4 +129,136 @@ describe('GET requests', () => {
         })
     })
 
+})
+
+
+
+describe('POST REQUESTS', () => {
+    test('200: responds with posted article (ticket 7)', () =>{
+        return request (app)
+        .post('/api/articles/2/comments')
+        .expect(201)
+        .send({'username': 'butter_bridge', 'comment':'A very interesting opinion'})
+        .then(({body : {post}}) => {
+            expect(post).toHaveProperty('comment_id', 19)
+            expect(post).toHaveProperty('body', 'A very interesting opinion')
+            expect(post).toHaveProperty('article_id', 2)
+            expect(post).toHaveProperty('author', 'butter_bridge')
+        })
+
+    })
+    test('400: responds with an error when username does not exist', () => {
+        return request (app)
+        .post('/api/articles/2/comments')
+        .expect(400)
+        .send({
+            'username' : "notReal",
+            'comment' : ' Whocares',
+        })
+        .then(({body}) => {
+            expect(body).toHaveProperty('msg')
+        })
+    })
+    test('400: responds with an error when post object is too large', () => {
+        return request (app)
+        .post('/api/articles/2/comments')
+        .expect(400)
+        .send({
+            'username' : "notReal",
+            'comment' : ' Whocares',
+            'another' : 1
+        })
+        .then(({body}) => {
+            expect(body).toHaveProperty('msg', 'Bad Request')
+        })
+    })
+    test('400: responds with an error when article_id does not exist', () => {
+        return request (app)
+        .post('/api/articles/999/comments')
+        .expect(400)
+        .send({
+            'username' : "notReal",
+            'comment' : ' Whocares',
+        })
+        .then(({body}) => {
+            expect(body).toHaveProperty('msg')
+        })
+    })
+})
+
+
+
+
+
+    test('404 : handles an invalid request with out of bounds :article_id', () => {
+        return request(app)
+        .get('/api/articles/888/comments')
+        .expect(404)
+        .then(({body : {msg}}) => {
+            console.log(msg)
+            expect(msg).toBe('Not Found')
+        })
+    })
+    test('400: handles bad request with an article_id that is NaN', () => {
+        return request(app)
+        .get('/api/articles/cheese/comments')
+        .expect(500)
+        .then(({body}) => {
+            expect(body.name).toBe('error')
+        })
+    })
+
+
+describe('PATCH REQUESTS', () => {
+    test('8 200: responds with updated article and vincremeneted vote count', () => {
+        return request(app)
+        .patch('/api/articles/3')
+        .send({inc_votes : 100})
+        .expect(200)
+        .then(({body : {article}}) => {
+            const [articleObj] = article
+           expect(articleObj).toHaveProperty('article_id', 3);
+           expect(articleObj).toHaveProperty('votes', 100);
+           expect(articleObj).toHaveProperty('body', 'some gifs');
+        })
+    })
+    test('8 200: responds with updated article and decremented vote count', () => {
+        return request(app)
+        .patch('/api/articles/2')
+        .send({inc_votes : -100})
+        .expect(200)
+        .then(({body : {article}}) => {
+            const [articleObj] = article
+            expect(articleObj).toHaveProperty('article_id', 2);
+            expect(articleObj).toHaveProperty('votes', -100);
+            expect(articleObj).toHaveProperty('author', 'icellusedkars');
+        })
+    })
+    test('8 404: responds with an error when passed an invalid article_id', () => {
+        return request (app)
+        .patch('/api/articles/100')
+        .send({inc_votes : 100})
+        .expect(404)
+        .then(({body}) => {
+            expect(body).toHaveProperty('msg', 'Not Found')
+        })
+    })
+    test('8 400: responds with an error when passed an invalid amount to increement -decremenet votes', () => {
+        return request (app)
+        .patch('/api/articles/2')
+        .send({inc_votes : 'hello there!'})
+        .expect(400)
+        .then(({error : {text}}) => {
+            expect(text).toEqual("{\"msg\":\"BAD REQUEST\"}")
+        })
+    })
+    test.only('8 400: responds with an error when passed no patch object at all', () => {
+        return request (app)
+        .patch('/api/articles/2')
+        .send()
+        .expect(400)
+        .then(({error : {text}}) => {
+            expect(text).toEqual("{\"msg\":\"BAD REQUEST\"}")
+        })
+    })
 })

@@ -76,12 +76,75 @@ const fetchSpecificCommentsByArticleId = (id) => {
     })
 }
 
+const publishCommentWithArticleId = (article_id, body) => {
+    const newComment = [
+        body.comment,
+        article_id,
+        body.username,
+        
+    ]
+
+
+    const bodySize = Object.keys(body).length
+    if (bodySize > 2){
+        return Promise.reject({status: 400, msg: 'Bad Request'})
+    }
+
+
+
+    const queryString = `INSERT INTO comments (body, article_id, author) VALUES ($1, $2, $3) RETURNING *; `
+
+     return db.query(queryString, newComment).then(() => {
+        return db.query(`SELECT * FROM comments;`).then(({rows}) => {
+
+            return (rows[rows.length -1])
+        })
+    })
+}
+
+
+const updateVotes = (article_id, inc_votes) => {
+
+    const queryString = `SELECT votes FROM articles WHERE article_id = $1;`
+    let newVotes;
+
+    return db.query(queryString, [article_id]).then(({rows}) => {
+        if (rows.length === 0){
+            return Promise.reject ({status : 404, msg: 'Not Found'})
+        }
+        const [voteObj] = rows
+
+        if (Math.sign(inc_votes) === 1){
+             newVotes = voteObj.votes + inc_votes
+        } else if (Math.sign(inc_votes) === -1){
+            newVotes = voteObj.votes - Math.abs(inc_votes)
+        }
+        const valueArray = [newVotes, article_id];
+        return db.query(`UPDATE articles SET votes = $1 WHERE article_id = $2;`, valueArray).then(() => {
+
+            return db.query(`SELECT * FROM articles WHERE article_id = $1`, [article_id]).then(({rows}) => {
+                return rows
+            })
+        })
+    })
+
+}
+
+
 const fetchUsers = () => {
     return db.query('SELECT * FROM users;').then(({rows}) => {
         return rows
     })
 }
 
-module.exports = {fetchTopics, fetchArticles, fetchSpecificArticle, fetchSpecificComments, fetchSpecificCommentsByArticleId, fetchUsers}
+
+
+
+
+
+
+
+module.exports = {fetchTopics, fetchArticles, fetchSpecificArticle, fetchSpecificComments, fetchSpecificCommentsByArticleId, publishCommentWithArticleId, updateVotes, fetchUsers}
+
 
 

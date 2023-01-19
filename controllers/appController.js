@@ -1,5 +1,7 @@
 
-const {fetchTopics, fetchArticles, fetchSpecificArticle, fetchSpecificComments, fetchSpecificCommentsByArticleId, fetchUsers} = require('../models/appModels.js')
+const {fetchTopics, fetchArticles, fetchSpecificArticle, fetchSpecificComments, fetchSpecificCommentsByArticleId, publishCommentWithArticleId, updateVotes, fetchUsers} = require('../models/appModels.js')
+
+
 
 
 const getTopics = (request,response,next) => {
@@ -11,7 +13,6 @@ const getTopics = (request,response,next) => {
     })
 }
 
-
 const getArticles = (request,response,next) => {
     fetchArticles().then((articles) => {
         response.status(200).send({articles})
@@ -21,15 +22,15 @@ const getArticles = (request,response,next) => {
     })
 }
 
+
+
 const getSpecificArticle = (request, response, next) => {
-    const {article_id} = request.params
-   fetchSpecificArticle(article_id).then((article) => {
-       response.status(200).send({article})
-   })
-   .catch((error) => {
-       next (error)
-   })
+     const {article_id} = request.params
+    fetchSpecificArticle(article_id).then((article) => {
+        response.status(200).send({article})
+    })
 }
+
 
 const getSpecificComments = (request, response, next) => {
     const {article_id} = request.params
@@ -40,10 +41,36 @@ const getSpecificComments = (request, response, next) => {
             console.log(result)
         })
     })
+}
+
+
+
+
+const postComment = (request, response, next) => {
+    const {params : {article_id}} = request
+    const {body} = request
+    publishCommentWithArticleId(article_id, body).then((post) => {
+        response.status(201).send({post})
+
+    })
     .catch((error) => {
         next(error)
     })
 }
+
+
+const patchVotes = (request, response, next) => {
+    const {article_id} = request.params
+    const {inc_votes} = request.body
+    updateVotes(article_id, inc_votes)
+    .then((article) =>  {
+        response.status(200).send({article})
+    })
+    .catch((error) => {
+        next(error)
+    })
+}
+
 
 const getUsers = (request, response, next) => {
     fetchUsers().then((users) => {
@@ -52,5 +79,10 @@ const getUsers = (request, response, next) => {
 }
 
 
-module.exports = {getTopics, getArticles, getSpecificArticle, getSpecificComments, getUsers}
+
+
+
+module.exports = {getTopics, getArticles, getSpecificArticle, getSpecificComments, postComment, patchVotes, getUsers}
+
+
 
