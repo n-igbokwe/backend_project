@@ -1,5 +1,5 @@
 
-const {fetchTopics, fetchArticles, fetchSpecificArticle, fetchSpecificComments, fetchSpecificCommentsByArticleId, publishCommentWithArticleId, updateVotes, fetchUsers} = require('../models/appModels.js')
+const {fetchTopics, fetchArticles, fetchSpecificArticle, fetchSpecificComments, fetchSpecificCommentsByArticleId, publishCommentWithArticleId, updateVotes, fetchUsers, removeComment, checkCommentIdBeforeRemove} = require('../models/appModels.js')
 
 
 
@@ -84,11 +84,25 @@ const getUsers = (request, response, next) => {
     })
 }
 
+const deleteComment = (request, response, next) => {
+    const {comment_id} = request.params
+    checkCommentIdBeforeRemove(comment_id)
+    .then(() => {
+     removeComment(comment_id).then((result) => {
+        response.status(204).send({result})
+         })
+    })
+    .catch((error) => {
+
+        next(error)
+    })
+}
 
 
 
 
-module.exports = {getTopics, getArticles, getSpecificArticle, getSpecificComments, postComment, patchVotes, getUsers}
+
+module.exports = {getTopics, getArticles, getSpecificArticle, getSpecificComments, postComment, patchVotes, getUsers, deleteComment}
 
 
 
