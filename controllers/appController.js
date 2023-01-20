@@ -32,6 +32,9 @@ const getSpecificArticle = (request, response, next) => {
     fetchSpecificArticle(article_id).then((article) => {
         response.status(200).send({article})
     })
+    .catch((error) => {
+        next (error)
+    })
 }
 
 

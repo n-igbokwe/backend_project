@@ -128,6 +128,37 @@ describe('GET requests', () => {
             expect(Object.keys(secondUser).length).toBe(3)
         })
     })
+    test('11 200: returns the correct article object with comment count when given an article_id ', () => {
+        return request (app)
+        .get('/api/articles/1')
+        .expect(200)
+        .then(({body: {article}}) => {
+            const [firstArt] = article
+            expect(firstArt).toHaveProperty('comment_count', '11')
+            expect(firstArt).toHaveProperty('article_id', 1)
+            expect(Object.keys(firstArt).length).toBe(9)
+
+        })
+    })
+    test('11 404 : responds with the appropriate error when passed an article_id that does not exist', () => {
+        return request (app)
+        .get('/api/articles/200')
+        .expect(404)
+        .then((error) => {
+            expect(error.status).toEqual(404);
+            expect(error.body).toEqual({msg : 'Not Found'})
+        })
+    })
+    test('11 400 : responds with the appropriate error when passed a non-integer article_id', () => {
+        return request (app)
+        .get('/api/articles/hacker')
+        .expect(400)
+        .then((error) => {
+            expect(error.status).toEqual(400)
+            expect(error.body).toEqual({msg : 'BAD REQUEST'})
+        })
+    })
+
 
 })
 
@@ -252,7 +283,7 @@ describe('PATCH REQUESTS', () => {
             expect(text).toEqual("{\"msg\":\"BAD REQUEST\"}")
         })
     })
-    test.only('8 400: responds with an error when passed no patch object at all', () => {
+    test('8 400: responds with an error when passed no patch object at all', () => {
         return request (app)
         .patch('/api/articles/2')
         .send()
@@ -263,7 +294,7 @@ describe('PATCH REQUESTS', () => {
     })
 })
 
-describe.only('complex queries', () => {
+describe('complex queries', () => {
     test('10 200: accepts topic filter', () => {
         return request(app)
         .get('/api/articles?topic=cats')
