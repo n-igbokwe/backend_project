@@ -5,7 +5,7 @@ const {fetchTopics, fetchArticles, fetchSpecificArticle, fetchSpecificComments, 
 
 
 const getTopics = (request,response,next) => {
-    fetchTopics().then((topics) => {
+   return fetchTopics().then((topics) => {
         response.status(200).send({topics})
     })
     .catch((error) => {
@@ -17,7 +17,7 @@ const getArticles = (request,response,next) => {
     const topic = request.query.topic
     const sortBy = request.query.sort_by
     const order = request.query.order
-    fetchArticles(order, sortBy, topic).then((articles) => {
+   return fetchArticles(order, sortBy, topic).then((articles) => {
         response.status(200).send({articles})
     })
     .catch((error) => {
@@ -29,7 +29,7 @@ const getArticles = (request,response,next) => {
 
 const getSpecificArticle = (request, response, next) => {
      const {article_id} = request.params
-    fetchSpecificArticle(article_id).then((article) => {
+   return fetchSpecificArticle(article_id).then((article) => {
         response.status(200).send({article})
     })
     .catch((error) => {
@@ -40,12 +40,15 @@ const getSpecificArticle = (request, response, next) => {
 
 const getSpecificComments = (request, response, next) => {
     const {article_id} = request.params
-    fetchSpecificCommentsByArticleId(article_id)
+    return fetchSpecificCommentsByArticleId(article_id)
     .then(() => {
         return fetchSpecificComments(article_id)
-        .then((result) => {
-            console.log(result)
+        .then((comments) => {
+            response.status(200).send({comments})
         })
+    })
+    .catch((error) => {
+        next (error)
     })
 }
 
@@ -55,7 +58,7 @@ const getSpecificComments = (request, response, next) => {
 const postComment = (request, response, next) => {
     const {params : {article_id}} = request
     const {body} = request
-    publishCommentWithArticleId(article_id, body).then((post) => {
+   return publishCommentWithArticleId(article_id, body).then((post) => {
         response.status(201).send({post})
 
     })
@@ -68,7 +71,7 @@ const postComment = (request, response, next) => {
 const patchVotes = (request, response, next) => {
     const {article_id} = request.params
     const {inc_votes} = request.body
-    updateVotes(article_id, inc_votes)
+    return updateVotes(article_id, inc_votes)
     .then((article) =>  {
         response.status(200).send({article})
     })
@@ -79,14 +82,14 @@ const patchVotes = (request, response, next) => {
 
 
 const getUsers = (request, response, next) => {
-    fetchUsers().then((users) => {
+    return fetchUsers().then((users) => {
         response.status(200).send({users})
     })
 }
 
 const deleteComment = (request, response, next) => {
     const {comment_id} = request.params
-    checkCommentIdBeforeRemove(comment_id)
+   return checkCommentIdBeforeRemove(comment_id)
     .then(() => {
      removeComment(comment_id).then((result) => {
         response.status(204).send({result})

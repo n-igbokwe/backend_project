@@ -47,6 +47,7 @@ if (topic !== undefined){
 
 } else {
 if (!greenlistedSortBys.includes(sort_by) || !greenlistedOrders.includes(order)){
+    console.log('here2')
         return Promise.reject({status:400, msg: 'Bad Request'})
     } else {
 
@@ -121,7 +122,7 @@ const fetchSpecificArticle = (id) => {
 }
 
 const fetchSpecificComments = (id) => {
-    const queryString = `SELECT * FROM comments WHERE article_id = $1 ORDER BY creted_at DESC;`
+    const queryString = `SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC;`
     return db.query(queryString, [id]).then(({rows}) => {
         return rows
     })
@@ -131,7 +132,6 @@ const fetchSpecificComments = (id) => {
 const fetchSpecificCommentsByArticleId = (id) => {
     const queryString = 'SELECT article_id FROM articles WHERE article_id = $1;'
     return db.query(queryString, [id]).then(({rowCount}) => {
-        console.log(rowCount)
         if (rowCount === 0){
             return Promise.reject({status: 404, msg: 'Not Found'})
             
