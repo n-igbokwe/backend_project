@@ -229,7 +229,7 @@ describe('POST REQUESTS', () => {
         .get('/api/articles/888/comments')
         .expect(404)
         .then(({body : {msg}}) => {
-            console.log(msg)
+
             expect(msg).toBe('Not Found')
         })
     })
@@ -238,7 +238,7 @@ describe('POST REQUESTS', () => {
         .get('/api/articles/sjkd/comments')
         .expect(400)
         .then(({body}) => {
-            console.log(body)
+
             expect(body.msg).toBe('BAD REQUEST')
         })
     })

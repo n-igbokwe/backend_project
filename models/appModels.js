@@ -47,7 +47,7 @@ if (topic !== undefined){
 
 } else {
 if (!greenlistedSortBys.includes(sort_by) || !greenlistedOrders.includes(order)){
-    console.log('here2')
+
         return Promise.reject({status:400, msg: 'Bad Request'})
     } else {
 
@@ -210,11 +210,11 @@ const checkCommentIdBeforeRemove = (id) => {
         const queryString = 'SELECT comment_id FROM comments WHERE comment_id = $1;'
         return db.query(queryString, [id]).then(({rowCount}) => {
             if (rowCount === 0){
-                console.log('hereHEHEHEHEHEHE')
+
                 return Promise.reject({status: 404, msg: 'Not Found'})
                 
             } else {
-                console.log('here')
+
                 return;
                 
             }
@@ -230,7 +230,7 @@ const removeComment = (article_id) => {
 
 db.query(deleteQueryString, [article_id])
 
-console.log(article_id)
+
        return db.query(errorQueryString, [article_id]).then(({result}) => {
             if (result){
 
