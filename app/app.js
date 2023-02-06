@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors')
 
 
 
@@ -7,6 +8,7 @@ const {getTopics, getArticles, getSpecificArticle, postComment, getSpecificComme
 
 
 const app = express();
+app.use(cors())
 
 app.use(express.json())
 
