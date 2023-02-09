@@ -9,7 +9,7 @@ const fetchTopics = () => {
 
 
 const fetchArticles = (order = 'desc', sort_by = 'created_at', topic) => {
-    const greenlistedSortBys = ['created_at', 'article_id', 'title', 'created_at', 'votes']
+    const greenlistedSortBys = ['created_at', 'article_id', 'title', 'created_at', 'votes', 'comment_count']
     const greenlistedOrders = ['asc', 'desc']
 
   
